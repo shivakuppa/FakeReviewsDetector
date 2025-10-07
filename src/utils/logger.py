@@ -2,25 +2,20 @@ import logging
 import logging.config
 import os
 from datetime import datetime
+from pathlib import Path
 
-# Timestamped log filenames
-LOG_FILE = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log"
-ERROR_LOG_FILE = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}-ERROR.log"
+# Root directory (two levels up from current file)
+ROOT_DIR = Path(__file__).resolve().parents[2]
+LOGS_DIR = ROOT_DIR / "logs"
+STANDARD_LOG_DIR = LOGS_DIR / "standard"
+ERROR_LOG_DIR = LOGS_DIR / "error"
 
-# Base logs directory (same level as src)
-BASE_LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
+STANDARD_LOG_DIR.mkdir(parents=True, exist_ok=True)
+ERROR_LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-# Separate subdirectories for standard and error logs
-STANDARD_LOG_DIR = os.path.join(BASE_LOG_DIR, "standard")
-ERROR_LOG_DIR = os.path.join(BASE_LOG_DIR, "error")
+LOG_FILE_PATH = STANDARD_LOG_DIR / f"{datetime.now():%m_%d_%Y_%H_%M_%S}.log"
+ERROR_LOG_FILE_PATH = ERROR_LOG_DIR / f"{datetime.now():%m_%d_%Y_%H_%M_%S}-ERROR.log"
 
-# Ensure directories exist
-os.makedirs(STANDARD_LOG_DIR, exist_ok=True)
-os.makedirs(ERROR_LOG_DIR, exist_ok=True)
-
-# Full paths to log files
-LOG_FILE_PATH = os.path.join(STANDARD_LOG_DIR, LOG_FILE)
-ERROR_LOG_FILE_PATH = os.path.join(ERROR_LOG_DIR, ERROR_LOG_FILE)
 
 # Logging configuration dictionary
 logging_config = {
