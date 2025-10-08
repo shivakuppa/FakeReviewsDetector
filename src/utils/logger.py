@@ -2,20 +2,18 @@ import logging
 import logging.config
 import os
 from datetime import datetime
-from pathlib import Path
 
 # Root directory (two levels up from current file)
-ROOT_DIR = Path(__file__).resolve().parents[2]
-LOGS_DIR = ROOT_DIR / "logs"
-STANDARD_LOG_DIR = LOGS_DIR / "standard"
-ERROR_LOG_DIR = LOGS_DIR / "error"
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-STANDARD_LOG_DIR.mkdir(parents=True, exist_ok=True)
-ERROR_LOG_DIR.mkdir(parents=True, exist_ok=True)
+# Log directories
+LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
-LOG_FILE_PATH = STANDARD_LOG_DIR / f"{datetime.now():%m_%d_%Y_%H_%M_%S}.log"
-ERROR_LOG_FILE_PATH = ERROR_LOG_DIR / f"{datetime.now():%m_%d_%Y_%H_%M_%S}-ERROR.log"
+# Create directory if it doesn't exist
+os.makedirs(LOGS_DIR, exist_ok=True)
 
+# Log file paths
+LOG_FILE_PATH = os.path.join(LOGS_DIR, "app.log")   # fixed name for rotation
 
 # Logging configuration dictionary
 logging_config = {
@@ -33,32 +31,23 @@ logging_config = {
             "level": "DEBUG",
             "formatter": "standard",
             "filename": LOG_FILE_PATH,
-            "maxBytes": 1000000,
-            "backupCount": 5,
-            "encoding": "utf8"
-        },
-        "console_handler": {
-            "class": "logging.StreamHandler",
-            "level": "INFO",
-            "formatter": "standard",
-            "stream": "ext://sys.stdout"
-        },
-        "error_file_handler": {
-            "class": "logging.FileHandler",
-            "level": "ERROR",
-            "formatter": "standard",
-            "filename": ERROR_LOG_FILE_PATH,
+            "maxBytes": 1_000_000,
+            "backupCount": 10,
             "encoding": "utf8"
         },
     },
     "root": {
         "level": "DEBUG",
-        "handlers": ["file_handler", "error_file_handler"]
+        "handlers": ["file_handler"]
     },
 }
 
 # Apply configuration
 logging.config.dictConfig(logging_config)
 
-# Optional: module-level logger
+# Module-level logger
 logger = logging.getLogger(__name__)
+
+# Add a spacer/header at the start of each execution
+header = "\n" + "="*60 + f"\nNEW EXECUTION STARTED: {datetime.now():%Y-%m-%d %H:%M:%S}\n" + "="*60 + "\n"
+logger.info(header)

@@ -1,7 +1,11 @@
 import sys
 import time
+import os
+import pandas as pd
+
 from src.utils.logger import logger
 from src.utils.exceptions import CustomException
+from src.data_ingestion.data_ingestion import DataIngestion
 
 def run_pipeline():
     logger.info("Starting the data pipeline...")
@@ -35,12 +39,23 @@ def divide_numbers(a, b):
         # Raise your custom exception
         raise CustomException(e, sys)
 
-if __name__ == "__main__":
-    logger.info("Starting test for CustomException...")
 
+def main():
     try:
-        result = divide_numbers(10, 0)  # This will trigger a ZeroDivisionError
-        logger.info(f"Result: {result}")
-    except CustomException as ce:
-        logger.error(f"Caught CustomException: {ce}")
-        print("An error occurred! Check logs/error/ for details.")
+        logger.info("=== Starting main data ingestion test ===")
+
+        # Example Kaggle dataset and categories
+        kaggle_dataset = "cynthiarempel/amazon-us-customer-reviews-dataset"
+        categories = ["Automotive", "Office_Products", "Outdoors", "Shoes", "Video_Games"]  # Use a few small categories first
+
+        ingestion = DataIngestion(kaggle_dataset=kaggle_dataset, categories=categories)
+        ingestion.initiate_ingestion()  # Make sure the function name matches!
+
+        logger.info("=== Data ingestion completed successfully ===")
+
+    except Exception as e:
+        logger.error(f"Unexpected error in main: {e}", exc_info=True)
+        raise CustomException(e, sys)
+
+if __name__ == "__main__":
+    main()
